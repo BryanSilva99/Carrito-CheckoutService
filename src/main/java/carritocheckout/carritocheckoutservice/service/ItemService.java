@@ -1,13 +1,13 @@
 package carritocheckout.carritocheckoutservice.service;
 
-import carritocheckout.carritocheckoutservice.entities.Item;
+import carritocheckout.carritocheckoutservice.entities.ItemCarrito;
 
 import java.util.List;
 
 public interface ItemService {
-    void agregarItem(Item item);
-    Item buscarItemPorId(Integer id);
-    List<Item> listaDeItems();
-    void actualziarItem(Item item);
+    void agregarItem(ItemCarrito item);
+    ItemCarrito buscarItemPorId(Integer id);
+    List<ItemCarrito> listaDeItems();
+    void actualziarItem(ItemCarrito item);
     void borrarItem(Integer id);
 }
