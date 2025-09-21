@@ -14,7 +14,7 @@ public class ItemCarrito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer productoId; // o @ManyToOne Producto producto;
+    private Integer productoId; // ID del producto que viene de otro servicio
 
     private Integer cantidad;
 
@@ -23,4 +23,8 @@ public class ItemCarrito {
     public Double getSubtotal() {
         return precioUnitario * cantidad;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carrito_id", nullable = false)
+    private Carrito carrito;
 }

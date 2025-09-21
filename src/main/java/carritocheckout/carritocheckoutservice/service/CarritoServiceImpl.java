@@ -67,9 +67,12 @@ public class CarritoServiceImpl implements CarritoService {
     @Override
     public void vaciarCarrito(Integer idUsuario) {
         Carrito carrito = obtenerCarritoPorUsuario(idUsuario);
+
+        itemRepository.deleteByCarrito(carrito);
+
         carrito.getItems().clear();
-        itemRepository.deleteAll(); // ⚠️ elimina todos los items de la DB; si quieres solo los de este carrito, mejor haz un deleteByCarritoId
         carrito.setTotal(0.0);
+
         carritoRepository.save(carrito);
     }
 
