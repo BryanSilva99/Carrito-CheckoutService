@@ -13,14 +13,16 @@ public class CarritoController {
     @Autowired
     private CarritoServiceImpl carritoService;
 
-    @PostMapping("/agregarCarrito")
-    public String agregarCarrito(@RequestParam Carrito carrito){
-        carritoService.agregarCarrito(carrito);
-        return "Hola";
+    @PostMapping("/crearCarrito")
+    public ResponseEntity<Carrito> crearCarrito(@RequestParam(required = false) Integer idUsuario){
+        Carrito carrito = carritoService.agregarCarrito(idUsuario);
+        return ResponseEntity.ok(carrito);
     }
 
-    @GetMapping("/hola")
-    public String holaMundo(){
-        return "Hola";
+    @PutMapping("/{idCarrito}/asignar-usuario")
+    public ResponseEntity<Carrito> asignarCarritoAUsuario(@PathVariable Integer idCarrito,@RequestParam Integer idUsuario){
+        Carrito carritoActualizado = carritoService.asignarCarritoAUsuario(idCarrito,idUsuario);
+        return ResponseEntity.ok(carritoActualizado);
     }
+
 }

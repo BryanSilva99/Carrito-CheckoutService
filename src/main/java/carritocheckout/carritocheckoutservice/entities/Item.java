@@ -1,9 +1,6 @@
 package carritocheckout.carritocheckoutservice.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +14,8 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer productoId;
+    @ManyToOne
+    @JoinColumn(name = "carrito_id")
+    private Carrito carrito;
 
 }

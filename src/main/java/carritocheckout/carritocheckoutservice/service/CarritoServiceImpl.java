@@ -12,8 +12,27 @@ public class CarritoServiceImpl implements CarritoService{
     private CarritoRepository carritoRepository;
 
     @Override
-    public void agregarCarrito(Carrito carrito) {
-        carritoRepository.save(carrito);
+    public Carrito agregarCarrito(Integer idUsuario) {
+        if(idUsuario!=null){
+            return carritoRepository.findCarritoByIdUsuario(idUsuario)
+                    .orElseGet(()->{
+                        Carrito nuevoCarrito = new Carrito();
+                        nuevoCarrito.setIdUsuario(idUsuario);
+                        return carritoRepository.save(nuevoCarrito);
+                    });
+        }
+        else {
+            Carrito nuevoCarrito = new Carrito();
+            return carritoRepository.save(nuevoCarrito);
+        }
+    }
+
+    @Override
+    public Carrito asignarCarritoAUsuario(Integer id, Integer idUsuario) {
+        Carrito carrito = carritoRepository.findById(id).
+                orElseThrow(()-> new RuntimeException("Carrito no encontrado"));
+        carrito.setIdUsuario(idUsuario);
+        return carritoRepository.save(carrito);
     }
 
     @Override
