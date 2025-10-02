@@ -9,13 +9,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item {
+public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer productoId;
-    @ManyToOne
-    @JoinColumn(name = "carrito_id")
-    private Carrito carrito;
-
+    private String nombre;
+    private Double precio;
+    private String imagenUrl; // opcional
 }
