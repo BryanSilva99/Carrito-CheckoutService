@@ -1,5 +1,6 @@
 package carritocheckout.carritocheckoutservice.controller;
 
+import carritocheckout.carritocheckoutservice.dtos.ProductoDTOResponse;
 import carritocheckout.carritocheckoutservice.entities.Carrito;
 import carritocheckout.carritocheckoutservice.entities.ItemCarrito;
 import carritocheckout.carritocheckoutservice.service.CarritoService;
@@ -39,10 +40,10 @@ public class CarritoController {
     }
 
     // Agregar un item
-    @PostMapping("/{idUsuario}/items")
-    public ResponseEntity<Carrito> agregarItem(@PathVariable Integer idUsuario, @RequestBody ItemCarrito item) {
-        Carrito carritoActualizado = carritoService.agregarItem(idUsuario, item);
-        return ResponseEntity.ok(carritoActualizado);
+    @PostMapping("items")
+    public ResponseEntity<Carrito> agregarItem(@RequestBody ProductoDTOResponse productoDTOResponse) {
+        carritoService.agregarItemAlCarrito(productoDTOResponse);
+        return ResponseEntity.ok().build();
     }
 
     // Actualizar cantidad de un item

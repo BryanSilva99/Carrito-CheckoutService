@@ -1,14 +1,14 @@
 package carritocheckout.carritocheckoutservice.service;
-
+import carritocheckout.carritocheckoutservice.dtos.ProductoDTOResponse;
 import carritocheckout.carritocheckoutservice.entities.Carrito;
 import carritocheckout.carritocheckoutservice.entities.ItemCarrito;
 import carritocheckout.carritocheckoutservice.repository.CarritoRepository;
 import carritocheckout.carritocheckoutservice.repository.ItemRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class CarritoServiceImpl implements CarritoService {
 
     private final CarritoRepository carritoRepository;
@@ -19,40 +19,34 @@ public class CarritoServiceImpl implements CarritoService {
         this.itemRepository = itemRepository;
     }
 
+    private Carrito crearNuevoCarrito(Integer idUsuario){
+        Carrito nuevoCarrito = new Carrito();
+        nuevoCarrito.setIdUsuario(idUsuario);
+        nuevoCarrito.setTotal(0.0);
+        return carritoRepository.save(nuevoCarrito);
+    }
+
+
     @Override
     public Carrito agregarCarrito(Integer idUsuario) {
         if (idUsuario != null) {
             return carritoRepository.findCarritoByIdUsuario(idUsuario)
                     .orElseGet(() -> {
-                        Carrito nuevoCarrito = new Carrito();
-                        nuevoCarrito.setIdUsuario(idUsuario);
-                        nuevoCarrito.setTotal(0.0);
-                        return carritoRepository.save(nuevoCarrito);
+                        return crearNuevoCarrito(idUsuario);
                     });
         } else {
-            Carrito nuevoCarrito = new Carrito();
-            nuevoCarrito.setTotal(0.0);
-            return carritoRepository.save(nuevoCarrito);
+            return crearNuevoCarrito(null);
         }
     }
 
     @Override
-    public Carrito asignarCarritoAUsuario(Integer id, Integer idUsuario) {
-        Carrito carrito = carritoRepository.findById(id)
+    public Carrito asignarCarritoAUsuario(Integer carritoId, Integer idUsuario) {
+        Carrito carrito = carritoRepository.findById(carritoId)
                 .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
         carrito.setIdUsuario(idUsuario);
         return carritoRepository.save(carrito);
     }
-
-    @Override
-    public Carrito obtenerCarritoPorId(Integer id) {
-        return null;
-    }
-
-    @Override
-    public void actualizarCarrito(Carrito carrito) {
-
-    }
+    
 
     @Override
     public Carrito crearCarrito(Carrito carrito) {
@@ -67,18 +61,23 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     @Override
-    public Carrito agregarItem(Integer idUsuario, ItemCarrito item) {
-        Carrito carrito = obtenerCarritoPorUsuario(idUsuario);
-        ItemCarrito itemGuardado = itemRepository.save(item);
-
-        if (carrito.getItems() == null) {
-            carrito.setItems(new ArrayList<>());
+    public void agregarItemAlCarrito(ProductoDTOResponse productoDTO) {
+        Carrito existente = agregarCarrito(productoDTO.getIdUsuario());
+        ItemCarrito itemExistente = itemRepository.findByCarritoAndProductoId(existente,productoDTO.getId())
+                .orElse(null);
+        if(itemExistente != null){
+            itemExistente.setCantidad(itemExistente.getCantidad()+ productoDTO.getCantidad());
+            itemRepository.save(itemExistente);
+        }else {
+            ItemCarrito nuevoItem = new ItemCarrito();
+            nuevoItem.setCarrito(existente);
+            nuevoItem.setProductoId(productoDTO.getId());
+            nuevoItem.setCantidad(productoDTO.getCantidad());
+            nuevoItem.setPrecioUnitario(productoDTO.getPrecio());
+            itemRepository.save(nuevoItem);
         }
-
-        carrito.getItems().add(itemGuardado);
-        recalcularTotal(carrito);
-
-        return carritoRepository.save(carrito);
+        recalcularTotal(existente);
+        carritoRepository.save(existente);
     }
 
     @Override
