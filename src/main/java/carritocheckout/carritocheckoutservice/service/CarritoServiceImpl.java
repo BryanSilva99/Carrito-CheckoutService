@@ -63,7 +63,7 @@ public class CarritoServiceImpl implements CarritoService {
     @Override
     public void agregarItemAlCarrito(ProductoDTOResponse productoDTO) {
         Carrito existente = agregarCarrito(productoDTO.getIdUsuario());
-        ItemCarrito itemExistente = itemRepository.findByCarritoAndProductoId(existente,productoDTO.getId())
+        ItemCarrito itemExistente = itemRepository.findByCarritoAndProductoId(existente,productoDTO.getIdProducto())
                 .orElse(null);
         if(itemExistente != null){
             itemExistente.setCantidad(itemExistente.getCantidad()+ productoDTO.getCantidad());
@@ -71,7 +71,7 @@ public class CarritoServiceImpl implements CarritoService {
         }else {
             ItemCarrito nuevoItem = new ItemCarrito();
             nuevoItem.setCarrito(existente);
-            nuevoItem.setProductoId(productoDTO.getId());
+            nuevoItem.setProductoId(productoDTO.getIdProducto());
             nuevoItem.setCantidad(productoDTO.getCantidad());
             nuevoItem.setPrecioUnitario(productoDTO.getPrecio());
             itemRepository.save(nuevoItem);
