@@ -1,4 +1,0 @@
-version: 1
-name: carrito-checkout-service
-type: dockerfile
-port: 8080
