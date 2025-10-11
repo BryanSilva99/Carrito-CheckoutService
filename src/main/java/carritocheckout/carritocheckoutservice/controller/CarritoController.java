@@ -1,13 +1,13 @@
 package carritocheckout.carritocheckoutservice.controller;
 
+import carritocheckout.carritocheckoutservice.dtos.CarritoDTO;
 import carritocheckout.carritocheckoutservice.dtos.ProductoDTOResponse;
-import carritocheckout.carritocheckoutservice.entities.Carrito;
 import carritocheckout.carritocheckoutservice.service.CarritoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/api/carritos")
 public class CarritoController {
 
@@ -18,63 +18,53 @@ public class CarritoController {
     }
 
     @PostMapping
-    public ResponseEntity<Carrito> crearCarrito(@RequestParam(required = false) Integer idUsuario) {
-        Carrito carrito = carritoService.agregarCarrito(idUsuario);
+    public ResponseEntity<CarritoDTO> crearCarrito(@RequestParam(required = false) Integer idUsuario) {
+        CarritoDTO carrito = carritoService.agregarCarrito(idUsuario);
         return ResponseEntity.ok(carrito);
     }
 
     @PutMapping("/{idCarrito}/asignar-usuario")
-    public ResponseEntity<Carrito> asignarCarritoAUsuario(
+    public ResponseEntity<CarritoDTO> asignarCarritoAUsuario(
             @PathVariable Integer idCarrito,
             @RequestParam Integer idUsuario) {
-
-        Carrito carritoActualizado = carritoService.asignarCarritoAUsuario(idCarrito, idUsuario);
+        CarritoDTO carritoActualizado = carritoService.asignarCarritoAUsuario(idCarrito, idUsuario);
         return ResponseEntity.ok(carritoActualizado);
     }
 
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<Carrito> obtenerCarritoPorUsuario(@PathVariable Integer idUsuario) {
-        Carrito carrito = carritoService.obtenerCarritoPorUsuario(idUsuario);
-        if (carrito == null) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<CarritoDTO> obtenerCarritoPorUsuario(@PathVariable Integer idUsuario) {
+        CarritoDTO carrito = carritoService.obtenerCarritoPorUsuario(idUsuario);
         return ResponseEntity.ok(carrito);
     }
 
     @GetMapping("/{idCarrito}")
-    public ResponseEntity<Carrito> obtenerCarritoPorId(@PathVariable Integer idCarrito) {
-        Carrito carrito = carritoService.obtenerCarritoPorId(idCarrito);
-        if (carrito == null) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<CarritoDTO> obtenerCarritoPorId(@PathVariable Integer idCarrito) {
+        CarritoDTO carrito = carritoService.obtenerCarritoPorId(idCarrito);
         return ResponseEntity.ok(carrito);
     }
 
     @PostMapping("/{idUsuario}/items")
-    public ResponseEntity<Carrito> agregarItem(
+    public ResponseEntity<CarritoDTO> agregarItem(
             @PathVariable Integer idUsuario,
-            @RequestBody ProductoDTOResponse productoDTOResponse) {
-
-        Carrito carritoActualizado = carritoService.agregarItemAlCarrito(idUsuario, productoDTOResponse);
+            @RequestBody ProductoDTOResponse productoDTO) {
+        CarritoDTO carritoActualizado = carritoService.agregarItemAlCarrito(idUsuario, productoDTO);
         return ResponseEntity.ok(carritoActualizado);
     }
 
     @PatchMapping("/{idUsuario}/items/{itemId}")
-    public ResponseEntity<Carrito> actualizarItem(
+    public ResponseEntity<CarritoDTO> actualizarItem(
             @PathVariable Integer idUsuario,
             @PathVariable Integer itemId,
             @RequestParam int nuevaCantidad) {
-
-        Carrito carritoActualizado = carritoService.actualizarCantidad(idUsuario, itemId, nuevaCantidad);
+        CarritoDTO carritoActualizado = carritoService.actualizarCantidad(idUsuario, itemId, nuevaCantidad);
         return ResponseEntity.ok(carritoActualizado);
     }
 
     @DeleteMapping("/{idUsuario}/items/{itemId}")
-    public ResponseEntity<Carrito> eliminarItem(
+    public ResponseEntity<CarritoDTO> eliminarItem(
             @PathVariable Integer idUsuario,
             @PathVariable Integer itemId) {
-
-        Carrito carritoActualizado = carritoService.eliminarItem(idUsuario, itemId);
+        CarritoDTO carritoActualizado = carritoService.eliminarItem(idUsuario, itemId);
         return ResponseEntity.ok(carritoActualizado);
     }
 

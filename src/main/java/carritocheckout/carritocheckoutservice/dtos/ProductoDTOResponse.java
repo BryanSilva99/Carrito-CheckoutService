@@ -12,5 +12,5 @@ public class ProductoDTOResponse {
     private String nombre;
     private Double precio;
     private Integer cantidad;
-    private Integer idUsuario;
+    private String imagenUrl;
 }
