@@ -6,11 +6,13 @@ import carritocheckout.carritocheckoutservice.entities.Carrito;
 public interface CarritoService {
 
     Carrito agregarCarrito(Integer idUsuario);
-    Carrito asignarCarritoAUsuario(Integer id,Integer idUsuario);
+    Carrito asignarCarritoAUsuario(Integer idCarrito, Integer idUsuario);
     Carrito crearCarrito(Carrito carrito);
     Carrito obtenerCarritoPorUsuario(Integer idUsuario);
-    void agregarItemAlCarrito(ProductoDTOResponse productoDTO); //endpoint expuesto para catalogo
+    Carrito obtenerCarritoPorId(Integer idCarrito);
+
+    Carrito agregarItemAlCarrito(Integer idUsuario, ProductoDTOResponse productoDTO);
     Carrito actualizarCantidad(Integer idUsuario, Integer itemId, int nuevaCantidad);
-    void eliminarItem(Integer idUsuario, Integer itemId);
+    Carrito eliminarItem(Integer idUsuario, Integer itemId);
     void vaciarCarrito(Integer idUsuario);
 }
