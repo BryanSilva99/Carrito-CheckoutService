@@ -1,5 +1,6 @@
 package carritocheckout.carritocheckoutservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,6 @@ public class ItemCarrito {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrito_id", nullable = false)
     @JsonIgnore
+    @JsonBackReference
     private Carrito carrito;
 }
