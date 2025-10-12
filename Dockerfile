@@ -7,6 +7,6 @@ RUN gradle clean build -x test
 # ---- Etapa 2: runtime ----
 FROM eclipse-temurin:24-jdk
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+COPY --from=build /app/build/libs/*.jar /app/
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
