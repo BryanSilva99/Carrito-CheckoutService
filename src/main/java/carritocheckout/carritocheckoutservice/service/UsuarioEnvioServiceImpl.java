@@ -3,6 +3,7 @@ package carritocheckout.carritocheckoutservice.service;
 import carritocheckout.carritocheckoutservice.dtos.UsuarioEnvioDTO;
 import carritocheckout.carritocheckoutservice.entities.DireccionEnvio;
 import carritocheckout.carritocheckoutservice.entities.UsuarioEnvio;
+import carritocheckout.carritocheckoutservice.repository.DireccionEnvioRepository;
 import carritocheckout.carritocheckoutservice.repository.UsuarioEnvioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
 
     private final UsuarioEnvioRepository usuarioEnvioRepository;
+    private final DireccionEnvioRepository direccionEnvioRepository;
 
-    public UsuarioEnvioServiceImpl(UsuarioEnvioRepository usuarioEnvioRepository) {
+    public UsuarioEnvioServiceImpl(UsuarioEnvioRepository usuarioEnvioRepository, DireccionEnvioRepository direccionEnvioRepository) {
         this.usuarioEnvioRepository = usuarioEnvioRepository;
+        this.direccionEnvioRepository = direccionEnvioRepository;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
 
     @Override
     @Transactional
-    public UsuarioEnvio agregarDireccion(Integer idUsuario, DireccionEnvio direccion) {
+    public DireccionEnvio agregarDireccion(Integer idUsuario, DireccionEnvio direccion) {
         UsuarioEnvio usuario = usuarioEnvioRepository.findByIdUsuario(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario de envío no encontrado"));
 
@@ -48,8 +51,9 @@ public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
         }
 
         direccion.setUsuarioEnvio(usuario);
-        usuario.getDirecciones().add(direccion);
 
-        return usuarioEnvioRepository.save(usuario);
+        DireccionEnvio nueva = direccionEnvioRepository.save(direccion);
+
+        return nueva;
     }
 }

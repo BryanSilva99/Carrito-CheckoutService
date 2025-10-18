@@ -36,7 +36,7 @@ public class DireccionEnvioController {
 
     // Agregar dirección al usuario
     @PostMapping("/usuario/{idUsuario}/direcciones")
-    public ResponseEntity<UsuarioEnvio> agregarDireccion(@PathVariable Integer idUsuario, @RequestBody DireccionEnvio direccion) {
+    public ResponseEntity<DireccionEnvio> agregarDireccion(@PathVariable Integer idUsuario, @RequestBody DireccionEnvio direccion) {
         return ResponseEntity.ok(usuarioEnvioService.agregarDireccion(idUsuario, direccion));
     }
 
