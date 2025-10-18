@@ -1,5 +1,6 @@
 package carritocheckout.carritocheckoutservice.service;
 
+import carritocheckout.carritocheckoutservice.dtos.UsuarioEnvioDTO;
 import carritocheckout.carritocheckoutservice.entities.DireccionEnvio;
 import carritocheckout.carritocheckoutservice.entities.UsuarioEnvio;
 import carritocheckout.carritocheckoutservice.repository.UsuarioEnvioRepository;
@@ -20,8 +21,17 @@ public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
     }
 
     @Override
-    public UsuarioEnvio obtenerPorIdUsuario(Integer idUsuario) {
-        return usuarioEnvioRepository.findByIdUsuario(idUsuario).orElse(null);
+    public UsuarioEnvioDTO obtenerPorIdUsuario(Integer idUsuario) {
+        UsuarioEnvio usuario = usuarioEnvioRepository.findByIdUsuario(idUsuario).orElse(null);
+        if (usuario == null)
+            return null;
+
+        return new UsuarioEnvioDTO(
+                usuario.getId(),
+                usuario.getIdUsuario(),
+                usuario.getEmail(),
+                usuario.getNombreCompleto(),
+                usuario.getTelefono());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package carritocheckout.carritocheckoutservice.controller;
 
+import carritocheckout.carritocheckoutservice.dtos.UsuarioEnvioDTO;
 import carritocheckout.carritocheckoutservice.entities.DireccionEnvio;
 import carritocheckout.carritocheckoutservice.entities.UsuarioEnvio;
 import carritocheckout.carritocheckoutservice.service.DireccionEnvioService;
@@ -29,7 +30,7 @@ public class DireccionEnvioController {
 
     // Obtener usuario de envío por idUsuario
     @GetMapping("/usuario/{idUsuario}")
-    public ResponseEntity<UsuarioEnvio> obtenerUsuarioEnvio(@PathVariable Integer idUsuario) {
+    public ResponseEntity<UsuarioEnvioDTO> obtenerUsuarioEnvio(@PathVariable Integer idUsuario) {
         return ResponseEntity.ok(usuarioEnvioService.obtenerPorIdUsuario(idUsuario));
     }
 
