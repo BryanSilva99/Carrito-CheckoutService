@@ -5,6 +5,7 @@ import carritocheckout.carritocheckoutservice.entities.DireccionEnvio;
 import carritocheckout.carritocheckoutservice.entities.UsuarioEnvio;
 import carritocheckout.carritocheckoutservice.repository.UsuarioEnvioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
@@ -35,6 +36,7 @@ public class UsuarioEnvioServiceImpl implements UsuarioEnvioService {
     }
 
     @Override
+    @Transactional
     public UsuarioEnvio agregarDireccion(Integer idUsuario, DireccionEnvio direccion) {
         UsuarioEnvio usuario = usuarioEnvioRepository.findByIdUsuario(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario de envío no encontrado"));
