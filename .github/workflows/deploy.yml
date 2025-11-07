@@ -1,0 +1,50 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Connect to VPS and deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service:latest
+            docker stop cart-checkout-service || true
+            docker rm cart-checkout-service || true
+
+            docker run -d \
+              --name cart-checkout-service \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e DB_URL="${{ secrets.DB_URL }}" \
+              -e DB_USER="${{ secrets.DB_USER }}" \
+              -e DB_PASS="${{ secrets.DB_PASS }}" \
+              ${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service:latest
