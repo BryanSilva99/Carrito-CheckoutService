@@ -18,6 +18,12 @@ public class CarritoController {
 
     // ========== GESTIÓN DE CARRITOS ==========
 
+    @PostMapping
+    public ResponseEntity<CarritoDTO> crearCarrito(@RequestParam(required = false) Integer idUsuario) {
+        CarritoDTO carrito = carritoService.agregarCarrito(idUsuario);
+        return ResponseEntity.ok(carrito);
+    }
+
     @PutMapping("/{idCarrito}/asignar-usuario")
     public ResponseEntity<CarritoDTO> asignarCarritoAUsuario(
             @PathVariable Integer idCarrito,
