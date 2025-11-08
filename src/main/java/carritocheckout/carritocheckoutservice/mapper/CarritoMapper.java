@@ -29,10 +29,10 @@ public class CarritoMapper {
     private ProductoDTOResponse toProductoDTO(ItemCarrito item) {
         ProductoDTOResponse dto = new ProductoDTOResponse();
         dto.setIdProducto(item.getProductoId());
+        dto.setIdVariante(item.getIdVariante());
         dto.setCantidad(item.getCantidad());
         dto.setPrecio(item.getPrecioUnitario());
 
-        // Luego, en el Service, puedes rellenar los demás campos con el mock
         return dto;
     }
 }

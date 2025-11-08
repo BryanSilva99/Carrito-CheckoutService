@@ -16,6 +16,8 @@ public class CarritoController {
         this.carritoService = carritoService;
     }
 
+    // ========== GESTIÓN DE CARRITOS ==========
+
     @PostMapping
     public ResponseEntity<CarritoDTO> crearCarrito(@RequestParam(required = false) Integer idUsuario) {
         CarritoDTO carrito = carritoService.agregarCarrito(idUsuario);
@@ -42,6 +44,13 @@ public class CarritoController {
         return ResponseEntity.ok(carrito);
     }
 
+    // ========== OPERACIONES POR USUARIO ==========
+
+    /**
+     * Agregar un item al carrito de un usuario
+     * POST /api/carritos/{idUsuario}/items
+     * Body: { "idProducto": 1, "idVariante": 4, "cantidad": 2 }
+     */
     @PostMapping("/{idUsuario}/items")
     public ResponseEntity<CarritoDTO> agregarItem(
             @PathVariable Integer idUsuario,
@@ -50,30 +59,51 @@ public class CarritoController {
         return ResponseEntity.ok(carritoActualizado);
     }
 
-    @PatchMapping("/{idUsuario}/items/{itemId}")
+    /**
+     * Actualizar cantidad de un producto (y su variante) en el carrito de usuario
+     * PATCH /api/carritos/{idUsuario}/items/{productoId}/{idVariante}?nuevaCantidad=5
+     */
+    @PatchMapping("/{idUsuario}/items/{productoId}/{idVariante}")
     public ResponseEntity<CarritoDTO> actualizarItem(
             @PathVariable Integer idUsuario,
-            @PathVariable Integer itemId,
+            @PathVariable Integer productoId,
+            @PathVariable(required = false) Integer idVariante,
             @RequestParam int nuevaCantidad) {
-        CarritoDTO carritoActualizado = carritoService.actualizarCantidad(idUsuario, itemId, nuevaCantidad);
+        CarritoDTO carritoActualizado = carritoService.actualizarCantidad(idUsuario, productoId, idVariante, nuevaCantidad);
         return ResponseEntity.ok(carritoActualizado);
     }
 
-    @DeleteMapping("/{idUsuario}/items/{itemId}")
+    /**
+     * Eliminar un producto (y su variante) del carrito de usuario
+     * DELETE /api/carritos/{idUsuario}/items/{productoId}/{idVariante}
+     */
+    @DeleteMapping("/{idUsuario}/items/{productoId}/{idVariante}")
     public ResponseEntity<CarritoDTO> eliminarItem(
             @PathVariable Integer idUsuario,
-            @PathVariable Integer itemId) {
-        CarritoDTO carritoActualizado = carritoService.eliminarItem(idUsuario, itemId);
+            @PathVariable Integer productoId,
+            @PathVariable(required = false) Integer idVariante) {
+        CarritoDTO carritoActualizado = carritoService.eliminarItem(idUsuario, productoId, idVariante);
         return ResponseEntity.ok(carritoActualizado);
     }
 
+    /**
+     * Vaciar todo el carrito de un usuario
+     * DELETE /api/carritos/{idUsuario}/items
+     */
     @DeleteMapping("/{idUsuario}/items")
     public ResponseEntity<Void> vaciarCarrito(@PathVariable Integer idUsuario) {
         carritoService.vaciarCarrito(idUsuario);
         return ResponseEntity.noContent().build();
     }
 
-     @PostMapping("/{idCarrito}/anonimo/items")
+    // ========== OPERACIONES POR ID CARRITO (ANÓNIMOS) ==========
+
+    /**
+     * Agregar un item al carrito anónimo
+     * POST /api/carritos/{idCarrito}/anonimo/items
+     * Body: { "idProducto": 1, "idVariante": 4, "cantidad": 2 }
+     */
+    @PostMapping("/{idCarrito}/anonimo/items")
     public ResponseEntity<CarritoDTO> agregarItemPorId(
             @PathVariable Integer idCarrito,
             @RequestBody ProductoDTOResponse productoDTO) {
@@ -81,23 +111,37 @@ public class CarritoController {
         return ResponseEntity.ok(carritoActualizado);
     }
 
-    @PatchMapping("/{idCarrito}/anonimo/items/{itemId}")
+    /**
+     * Actualizar cantidad en carrito anónimo
+     * PATCH /api/carritos/{idCarrito}/anonimo/items/{productoId}/{idVariante}?nuevaCantidad=3
+     */
+    @PatchMapping("/{idCarrito}/anonimo/items/{productoId}/{idVariante}")
     public ResponseEntity<CarritoDTO> actualizarItemPorId(
             @PathVariable Integer idCarrito,
-            @PathVariable Integer itemId,
+            @PathVariable Integer productoId,
+            @PathVariable(required = false) Integer idVariante,
             @RequestParam int nuevaCantidad) {
-        CarritoDTO carritoActualizado = carritoService.actualizarCantidadPorId(idCarrito, itemId, nuevaCantidad);
+        CarritoDTO carritoActualizado = carritoService.actualizarCantidadPorId(idCarrito, productoId, idVariante, nuevaCantidad);
         return ResponseEntity.ok(carritoActualizado);
     }
 
-    @DeleteMapping("/{idCarrito}/anonimo/items/{itemId}")
+    /**
+     * Eliminar un producto (y su variante) del carrito anónimo
+     * DELETE /api/carritos/{idCarrito}/anonimo/items/{productoId}/{idVariante}
+     */
+    @DeleteMapping("/{idCarrito}/anonimo/items/{productoId}/{idVariante}")
     public ResponseEntity<CarritoDTO> eliminarItemPorId(
             @PathVariable Integer idCarrito,
-            @PathVariable Integer itemId) {
-        CarritoDTO carritoActualizado = carritoService.eliminarItemPorId(idCarrito, itemId);
+            @PathVariable Integer productoId,
+            @PathVariable(required = false) Integer idVariante) {
+        CarritoDTO carritoActualizado = carritoService.eliminarItemPorId(idCarrito, productoId, idVariante);
         return ResponseEntity.ok(carritoActualizado);
     }
 
+    /**
+     * Vaciar todo el carrito anónimo
+     * DELETE /api/carritos/{idCarrito}/anonimo/items
+     */
     @DeleteMapping("/{idCarrito}/anonimo/items")
     public ResponseEntity<Void> vaciarCarritoPorId(@PathVariable Integer idCarrito) {
         carritoService.vaciarCarritoPorId(idCarrito);

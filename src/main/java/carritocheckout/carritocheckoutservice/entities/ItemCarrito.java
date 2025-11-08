@@ -18,6 +18,8 @@ public class ItemCarrito {
 
     private Integer productoId; // ID del producto que viene de otro servicio
 
+    private Integer idVariante;
+
     private Integer cantidad;
 
     private Double precioUnitario; // para calcular totales incluso si cambia el precio en el catálogo

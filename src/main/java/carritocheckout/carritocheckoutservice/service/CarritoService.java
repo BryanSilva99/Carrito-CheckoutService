@@ -7,18 +7,23 @@ import carritocheckout.carritocheckoutservice.entities.Carrito;
 public interface CarritoService {
 
     CarritoDTO agregarCarrito(Integer idUsuario);
+
     CarritoDTO asignarCarritoAUsuario(Integer idCarrito, Integer idUsuario);
+
     CarritoDTO crearCarrito(Carrito carrito);
+
     CarritoDTO obtenerCarritoPorUsuario(Integer idUsuario);
     CarritoDTO obtenerCarritoPorId(Integer idCarrito);
 
     CarritoDTO agregarItemAlCarrito(Integer idUsuario, ProductoDTOResponse productoDTO);
-    CarritoDTO actualizarCantidad(Integer idUsuario, Integer itemId, int nuevaCantidad);
-    CarritoDTO eliminarItem(Integer idUsuario, Integer itemId);
-    void vaciarCarrito(Integer idUsuario);
+    CarritoDTO agregarItemAlCarritoPorId(Integer idUsuario, ProductoDTOResponse productoDTO);
 
-    public CarritoDTO agregarItemAlCarritoPorId(Integer idCarrito, ProductoDTOResponse productoDTO);
-    public CarritoDTO actualizarCantidadPorId(Integer idCarrito, Integer productoId, int nuevaCantidad);
-    public CarritoDTO eliminarItemPorId(Integer idCarrito, Integer productoId);
-    public void vaciarCarritoPorId(Integer idCarrito);
+    CarritoDTO actualizarCantidad(Integer idUsuario, Integer productoId, Integer idVariante, int nuevaCantidad);
+    CarritoDTO actualizarCantidadPorId(Integer idCarrito, Integer productoId, Integer idVariante, int nuevaCantidad);
+    
+    CarritoDTO eliminarItem(Integer idUsuario, Integer productoId, Integer idVariante);
+    CarritoDTO eliminarItemPorId(Integer idCarrito, Integer productoId, Integer idVariante);
+
+    void vaciarCarrito(Integer idUsuario);
+    void vaciarCarritoPorId(Integer idCarrito);
 }

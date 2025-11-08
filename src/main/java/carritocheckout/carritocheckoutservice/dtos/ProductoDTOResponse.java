@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductoDTOResponse {
     private Integer idProducto;
+    private Integer idVariante;
     private String nombre;
+    private String sku;
     private Double precio;
     private Integer cantidad;
     private String imagenUrl;
