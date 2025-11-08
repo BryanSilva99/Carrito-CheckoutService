@@ -44,7 +44,7 @@ jobs:
 
             docker run -d \
               --name cart-checkout-service \
-              -p 8080:8080 \
+              -p 6000:8080 \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL="${{ secrets.DB_URL }}" \
               -e DB_USER="${{ secrets.DB_USER }}" \
