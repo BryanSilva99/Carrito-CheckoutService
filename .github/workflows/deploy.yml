@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: VPSLUEDU
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,6 +28,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+    environment: VPSLUEDU
     needs: build
     steps:
       - name: Connect to VPS and deploy
