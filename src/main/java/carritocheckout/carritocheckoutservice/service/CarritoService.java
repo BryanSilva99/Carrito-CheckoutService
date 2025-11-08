@@ -16,4 +16,9 @@ public interface CarritoService {
     CarritoDTO actualizarCantidad(Integer idUsuario, Integer itemId, int nuevaCantidad);
     CarritoDTO eliminarItem(Integer idUsuario, Integer itemId);
     void vaciarCarrito(Integer idUsuario);
+
+    public CarritoDTO agregarItemAlCarritoPorId(Integer idCarrito, ProductoDTOResponse productoDTO);
+    public CarritoDTO actualizarCantidadPorId(Integer idCarrito, Integer productoId, int nuevaCantidad);
+    public CarritoDTO eliminarItemPorId(Integer idCarrito, Integer productoId);
+    public void vaciarCarritoPorId(Integer idCarrito);
 }

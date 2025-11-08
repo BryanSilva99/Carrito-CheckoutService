@@ -33,7 +33,8 @@ public class CarritoServiceImpl implements CarritoService {
     private final ItemRepository itemRepository;
     private final CarritoMapper carritoMapper;
 
-    public CarritoServiceImpl(CarritoRepository carritoRepository, ItemRepository itemRepository, CarritoMapper carritoMapper) {
+    public CarritoServiceImpl(CarritoRepository carritoRepository, ItemRepository itemRepository,
+            CarritoMapper carritoMapper) {
         this.carritoRepository = carritoRepository;
         this.itemRepository = itemRepository;
         this.carritoMapper = carritoMapper;
@@ -101,7 +102,7 @@ public class CarritoServiceImpl implements CarritoService {
         // Obtener información del producto desde el servicio de catálogo
         Map<String, Object> productoInfo = obtenerProductoDesdeAPI(productoDTO.getIdProducto());
         Double precioActual = extraerPrecioDesdeVariantes(productoInfo);
-        
+
         System.out.println("💰 Precio obtenido para producto " + productoDTO.getIdProducto() + ": " + precioActual);
 
         // Buscar si el producto ya está en el carrito
@@ -152,7 +153,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         recalcularTotal(carrito);
         Carrito actualizado = carritoRepository.save(carrito);
-        
+
         CarritoDTO dto = carritoMapper.toDTO(actualizado);
         enriquecerProductosDesdeAPI(dto);
         return dto;
@@ -214,13 +215,13 @@ public class CarritoServiceImpl implements CarritoService {
         try {
             String url = catalogoServiceUrl + "/api/productos/" + idProducto;
             System.out.println("🔍 Consultando: " + url);
-            
+
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-            
+
             if (response.getBody() == null) {
                 throw new RuntimeException("Producto no encontrado: " + idProducto);
             }
-            
+
             System.out.println("✅ Producto obtenido: " + response.getBody().get("nombre"));
             return response.getBody();
         } catch (Exception e) {
@@ -234,23 +235,24 @@ public class CarritoServiceImpl implements CarritoService {
      * Enriquece todos los productos del carrito con datos del API
      */
     private void enriquecerProductosDesdeAPI(CarritoDTO dto) {
-        if (dto.getItems() == null) return;
+        if (dto.getItems() == null)
+            return;
 
         dto.getItems().forEach(item -> {
             try {
                 Map<String, Object> productoInfo = obtenerProductoDesdeAPI(item.getIdProducto());
-                
+
                 // Extraer datos básicos del producto
                 item.setNombre((String) productoInfo.get("nombre"));
-                
+
                 // Obtener imagen principal desde productoImagenes
                 String imagenUrl = extraerImagenPrincipal(productoInfo);
                 item.setImagenUrl(imagenUrl);
-                
+
                 // Obtener precio desde la primera variante
                 Double precio = extraerPrecioDesdeVariantes(productoInfo);
                 item.setPrecio(precio);
-                
+
             } catch (Exception e) {
                 System.err.println("⚠️ No se pudo enriquecer producto " + item.getIdProducto() + ": " + e.getMessage());
                 // Mantener los datos que ya tiene el item
@@ -266,7 +268,7 @@ public class CarritoServiceImpl implements CarritoService {
             Object imagenesObj = productoInfo.get("productoImagenes");
             if (imagenesObj instanceof List) {
                 List<Map<String, Object>> imagenes = (List<Map<String, Object>>) imagenesObj;
-                
+
                 // Buscar la imagen marcada como principal
                 for (Map<String, Object> img : imagenes) {
                     Boolean esPrincipal = (Boolean) img.get("principal");
@@ -274,7 +276,7 @@ public class CarritoServiceImpl implements CarritoService {
                         return (String) img.get("imagen");
                     }
                 }
-                
+
                 // Si no hay imagen principal, tomar la primera
                 if (!imagenes.isEmpty()) {
                     return (String) imagenes.get(0).get("imagen");
@@ -294,11 +296,11 @@ public class CarritoServiceImpl implements CarritoService {
             Object variantesObj = productoInfo.get("variantes");
             if (variantesObj instanceof List) {
                 List<Map<String, Object>> variantes = (List<Map<String, Object>>) variantesObj;
-                
+
                 if (!variantes.isEmpty()) {
                     Map<String, Object> primeraVariante = variantes.get(0);
                     Object precioObj = primeraVariante.get("precio");
-                    
+
                     if (precioObj instanceof Double) {
                         return (Double) precioObj;
                     } else if (precioObj instanceof Integer) {
@@ -314,26 +316,102 @@ public class CarritoServiceImpl implements CarritoService {
         return 0.0;
     }
 
-    /**
-     * Extrae el precio del objeto Map, manejando Integer o Double
-     * @deprecated Usar extraerPrecioDesdeVariantes para productos con variantes
-     */
-    private Double extraerPrecio(Map<String, Object> productoInfo) {
-        // Primero intentar obtener desde variantes
-        Double precioVariante = extraerPrecioDesdeVariantes(productoInfo);
-        if (precioVariante != null && precioVariante > 0) {
-            return precioVariante;
+    // ========== IMPLEMENTACIONES CON CARRITO ID ==========
+
+    @Override
+    public CarritoDTO agregarItemAlCarritoPorId(Integer idCarrito, ProductoDTOResponse productoDTO) {
+        Carrito carrito = carritoRepository.findById(idCarrito)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+
+        if (carrito.getItems() == null) {
+            carrito.setItems(new ArrayList<>());
         }
-        
-        // Fallback: buscar precio directo (por compatibilidad)
-        Object precio = productoInfo.get("precio");
-        if (precio instanceof Double) {
-            return (Double) precio;
-        } else if (precio instanceof Integer) {
-            return ((Integer) precio).doubleValue();
-        } else if (precio instanceof Number) {
-            return ((Number) precio).doubleValue();
+
+        Map<String, Object> productoInfo = obtenerProductoDesdeAPI(productoDTO.getIdProducto());
+        Double precioActual = extraerPrecioDesdeVariantes(productoInfo);
+
+        Optional<ItemCarrito> itemExistente = carrito.getItems().stream()
+                .filter(item -> item.getProductoId().equals(productoDTO.getIdProducto()))
+                .findFirst();
+
+        if (itemExistente.isPresent()) {
+            ItemCarrito item = itemExistente.get();
+            item.setCantidad(item.getCantidad() + productoDTO.getCantidad());
+            itemRepository.save(item);
+        } else {
+            ItemCarrito nuevoItem = new ItemCarrito();
+            nuevoItem.setCarrito(carrito);
+            nuevoItem.setProductoId(productoDTO.getIdProducto());
+            nuevoItem.setCantidad(productoDTO.getCantidad());
+            nuevoItem.setPrecioUnitario(precioActual);
+            itemRepository.save(nuevoItem);
+            carrito.getItems().add(nuevoItem);
         }
-        return 0.0;
+
+        recalcularTotal(carrito);
+        Carrito actualizado = carritoRepository.save(carrito);
+
+        CarritoDTO dto = carritoMapper.toDTO(actualizado);
+        enriquecerProductosDesdeAPI(dto);
+        return dto;
+    }
+
+    @Override
+    public CarritoDTO actualizarCantidadPorId(Integer idCarrito, Integer productoId, int nuevaCantidad) {
+        Carrito carrito = carritoRepository.findById(idCarrito)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado con ID: " + idCarrito));
+
+        ItemCarrito item = carrito.getItems().stream()
+                .filter(i -> i.getProductoId().equals(productoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Item no encontrado: " + productoId));
+
+        if (nuevaCantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
+        }
+
+        item.setCantidad(nuevaCantidad);
+        itemRepository.save(item);
+
+        recalcularTotal(carrito);
+        Carrito actualizado = carritoRepository.save(carrito);
+
+        CarritoDTO dto = carritoMapper.toDTO(actualizado);
+        enriquecerProductosDesdeAPI(dto);
+        return dto;
+    }
+
+    @Override
+    public CarritoDTO eliminarItemPorId(Integer idCarrito, Integer productoId) {
+        Carrito carrito = carritoRepository.findById(idCarrito)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado con ID: " + idCarrito));
+
+        ItemCarrito itemAEliminar = carrito.getItems().stream()
+                .filter(item -> item.getProductoId().equals(productoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Item no encontrado: " + productoId));
+
+        carrito.getItems().remove(itemAEliminar);
+        itemRepository.delete(itemAEliminar);
+
+        recalcularTotal(carrito);
+        Carrito actualizado = carritoRepository.save(carrito);
+
+        CarritoDTO dto = carritoMapper.toDTO(actualizado);
+        enriquecerProductosDesdeAPI(dto);
+        return dto;
+    }
+
+    @Override
+    public void vaciarCarritoPorId(Integer idCarrito) {
+        Carrito carrito = carritoRepository.findById(idCarrito)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado con ID: " + idCarrito));
+
+        itemRepository.deleteByCarrito(carrito);
+        carrito.getItems().clear();
+        carrito.setTotal(0.0);
+        carritoRepository.save(carrito);
+
+        System.out.println("🧹 Carrito vaciado correctamente (ID: " + idCarrito + ")");
     }
 }

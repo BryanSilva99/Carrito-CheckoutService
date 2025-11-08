@@ -72,4 +72,35 @@ public class CarritoController {
         carritoService.vaciarCarrito(idUsuario);
         return ResponseEntity.noContent().build();
     }
+
+     @PostMapping("/{idCarrito}/anonimo/items")
+    public ResponseEntity<CarritoDTO> agregarItemPorId(
+            @PathVariable Integer idCarrito,
+            @RequestBody ProductoDTOResponse productoDTO) {
+        CarritoDTO carritoActualizado = carritoService.agregarItemAlCarritoPorId(idCarrito, productoDTO);
+        return ResponseEntity.ok(carritoActualizado);
+    }
+
+    @PatchMapping("/{idCarrito}/anonimo/items/{itemId}")
+    public ResponseEntity<CarritoDTO> actualizarItemPorId(
+            @PathVariable Integer idCarrito,
+            @PathVariable Integer itemId,
+            @RequestParam int nuevaCantidad) {
+        CarritoDTO carritoActualizado = carritoService.actualizarCantidadPorId(idCarrito, itemId, nuevaCantidad);
+        return ResponseEntity.ok(carritoActualizado);
+    }
+
+    @DeleteMapping("/{idCarrito}/anonimo/items/{itemId}")
+    public ResponseEntity<CarritoDTO> eliminarItemPorId(
+            @PathVariable Integer idCarrito,
+            @PathVariable Integer itemId) {
+        CarritoDTO carritoActualizado = carritoService.eliminarItemPorId(idCarrito, itemId);
+        return ResponseEntity.ok(carritoActualizado);
+    }
+
+    @DeleteMapping("/{idCarrito}/anonimo/items")
+    public ResponseEntity<Void> vaciarCarritoPorId(@PathVariable Integer idCarrito) {
+        carritoService.vaciarCarritoPorId(idCarrito);
+        return ResponseEntity.noContent().build();
+    }
 }
