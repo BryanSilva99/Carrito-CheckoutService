@@ -38,10 +38,17 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            echo "Pulling latest container..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service:latest
+
+            echo "Stopping old container..."
             docker stop cart-checkout-service || true
             docker rm cart-checkout-service || true
 
+            echo "Removing older images..."
+            docker images --filter=reference='${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service' --format '{{.ID}}' | tail -n +2 | xargs -r docker rmi
+
+            echo "Starting new container..."
             docker run -d \
               --name cart-checkout-service \
               -p 6000:8080 \
@@ -50,3 +57,7 @@ jobs:
               -e DB_USER="${{ secrets.DB_USER }}" \
               -e DB_PASS="${{ secrets.DB_PASS }}" \
               ${{ secrets.DOCKERHUB_USERNAME }}/cart-checkout-service:latest
+
+            echo "Container logs (last 50 lines):"
+            sleep 5
+            docker logs --tail 50 cart-checkout-service
