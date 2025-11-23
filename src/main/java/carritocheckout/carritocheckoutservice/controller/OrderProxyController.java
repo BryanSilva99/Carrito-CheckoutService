@@ -14,7 +14,6 @@ import carritocheckout.carritocheckoutservice.service.OrderProxyService;
 
 @RestController
 @RequestMapping("/api/proxy/orders")
-@CrossOrigin(origins = "*") // habilita CORS desde tu frontend
 public class OrderProxyController {
 
     private final OrderProxyService orderProxyService;
