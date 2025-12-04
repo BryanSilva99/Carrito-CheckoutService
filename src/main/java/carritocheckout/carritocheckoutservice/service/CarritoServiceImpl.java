@@ -24,7 +24,7 @@ import java.util.Optional;
 public class CarritoServiceImpl implements CarritoService {
 
     @Autowired
-    private RestTemplate restTemplate;
+    protected RestTemplate restTemplate;
 
     @Value("${catalogo.service.url:https://catalogo-service-dcc3a7dgbja8b6dd.canadacentral-01.azurewebsites.net}")
     private String catalogoServiceUrl;
