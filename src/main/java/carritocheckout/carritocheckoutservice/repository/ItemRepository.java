@@ -12,4 +12,6 @@ public interface ItemRepository extends JpaRepository<ItemCarrito, Integer> {
     Optional<ItemCarrito> findByCarritoAndProductoId(Carrito carrito, Integer productoId);
     List<ItemCarrito> findByCarrito(Carrito carrito);
     void deleteByCarrito(Carrito carrito);
+    List<ItemCarrito> findByCarrito_Id(Long carritoId);
+
 }
