@@ -13,18 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Ensure Gradle version is 21
+      - name: Ensure Java toolchain version is 21
         run: |
-          echo "Verifying version in build.gradle"
-          CURRENT_VERSION=$(grep -E '^version' build.gradle | sed 's/[^0-9]*//g')
-          echo "Current version: $CURRENT_VERSION"
-          if [ "$CURRENT_VERSION" != "21" ]; then
-            echo "Version is not 21. Updating automatically..."
-            sed -i 's/^version.*/version = 21/' build.gradle
-            echo "Version updated to 21"
+          echo "Checking Java toolchain version..."
+          if grep -q "languageVersion = JavaLanguageVersion.of(21)" build.gradle; then
+            echo "Java toolchain already set to 21."
           else
-            echo "Version already correct."
+            echo "Updating Java toolchain version to 21..."
+            sed -i "s/languageVersion = JavaLanguageVersion.of([0-9]*)/languageVersion = JavaLanguageVersion.of(21)/" build.gradle
+            echo "Updated!"
           fi
+
+          echo "Resulting build.gradle:"
+          grep "languageVersion" build.gradle
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
