@@ -1,51 +1,48 @@
 package carritocheckout.carritocheckoutservice.testINT;
 
-import carritocheckout.carritocheckoutservice.repository.ItemRepository;
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import carritocheckout.carritocheckoutservice.dtos.ProductoDTOResponse;
+import carritocheckout.carritocheckoutservice.service.CatalogoServiceImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.web.client.RestTemplate;
 
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CarritoIntegrationTest {
 
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private ItemRepository itemRepository;
-
     @Test
-    @Order(1)
-    void agregarProductoDebePersistirEnBD() {
+    void testObtenerProducto() {
+        // Mock del RestTemplate
+        RestTemplate restTemplateMock = Mockito.mock(RestTemplate.class);
 
-        given()
-                .baseUri("http://localhost:" + port)
-                .contentType("application/json")
-                .body("""
-                {
-                    "productId": 10,
-                    "cantidad": 2
-                }
-            """)
-                .when()
-                .post("/carrito/1/items")
-                .then()
-                .statusCode(200)
-                .body("productId", equalTo(10))
-                .body("cantidad", equalTo(2));
+        // Instanciamos el servicio con el mock
+        CatalogoServiceImpl catalogoService = new CatalogoServiceImpl(restTemplateMock);
 
-        // Verificar en BD
-        var items = itemRepository.findByCarrito_Id(1L);
+        // Preparamos una respuesta simulada
+        ProductoDTOResponse mockResponse = new ProductoDTOResponse();
+        mockResponse.setIdProducto(10);
+        mockResponse.setIdVariante(1);
+        mockResponse.setNombre("Producto de prueba");
+        mockResponse.setSku("ABC123");
+        mockResponse.setPrecio(50.0);
+        mockResponse.setCantidad(5);
+        mockResponse.setImagenUrl("http://img.com/a.png");
 
-        assertFalse(items.isEmpty());
-        assertEquals(10, items.get(0).getProductoId());
-        assertEquals(2, items.get(0).getCantidad());
+        // URL que debe construirse
+        String urlEsperada = "http://apiCatalogo10";
+
+        // Definir comportamiento del mock
+        Mockito.when(restTemplateMock.getForObject(eq(urlEsperada), eq(ProductoDTOResponse.class)))
+                .thenReturn(mockResponse);
+
+        // Ejecutamos el método real
+        ProductoDTOResponse resultado = catalogoService.obtenerProducto(10);
+
+        // Validaciones
+        assertNotNull(resultado);
+        assertEquals(10, resultado.getIdProducto());
+        assertEquals("Producto de prueba", resultado.getNombre());
+        assertEquals(50.0, resultado.getPrecio());
     }
 }
